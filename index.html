@@ -427,24 +427,27 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(148, 163, 184, .16);
+      border: 1px solid rgba(96, 165, 250, .22);
       border-radius: 12px;
-      background: rgba(255, 255, 255, .035);
-      padding: 10px;
+      background: rgba(96, 165, 250, .06);
+      padding: 14px 10px;
       color: #fff;
       text-align: center;
     }
 
     .role-card:nth-child(1) {
-      grid-row: 1;
+      grid-row: 1 / span 2;
+      align-self: stretch;
     }
 
     .role-card:nth-child(2) {
-      grid-row: 3;
+      grid-row: 3 / span 2;
+      align-self: stretch;
     }
 
     .role-card:nth-child(3) {
       grid-row: 5;
+      align-self: stretch;
     }
 
     .role-card b {
@@ -1191,7 +1194,9 @@
               <div class="flow-title">运行维护流程</div>
               <div class="flow-lanes">
                 <div class="flow-stage admin">
-                  <div class="flow-node">号池维护/异常处理</div>
+                  <div class="flow-node">号池维护</div>
+                  <div class="mini-connector"></div>
+                  <div class="flow-node">异常处理</div>
                 </div>
                 <div class="flow-connector to-lead"></div>
                 <div class="flow-stage lead">
