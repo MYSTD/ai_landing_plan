@@ -167,7 +167,7 @@
       top: 0;
       z-index: 20;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 10px;
       padding: 10px 0 18px;
       background: linear-gradient(180deg, rgba(5, 7, 13, .94) 0%, rgba(5, 7, 13, .78) 72%, transparent 100%);
@@ -748,6 +748,105 @@
       font-size: 12px;
     }
 
+    .case-layout {
+      display: grid;
+      gap: 16px;
+    }
+
+    .case-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(340px, .82fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .case-principles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .case-principles div {
+      border-top: 1px solid rgba(34, 211, 238, .34);
+      padding-top: 12px;
+    }
+
+    .case-principles b {
+      display: block;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .case-principles span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .backend-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .case-stage {
+      position: relative;
+      min-height: 296px;
+      border: 1px solid rgba(148, 163, 184, .18);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .022));
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .case-stage::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(34, 211, 238, .86), rgba(96, 165, 250, .24));
+    }
+
+    .stage-index {
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      margin-bottom: 9px;
+    }
+
+    .case-stage h3 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 16px;
+      line-height: 1.34;
+    }
+
+    .case-stage p {
+      margin: 0 0 9px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.58;
+    }
+
+    .case-stage b {
+      color: var(--soft);
+    }
+
+    .stage-goal {
+      color: #dbeafe !important;
+    }
+
+    .stage-practice {
+      border-top: 1px solid rgba(148, 163, 184, .16);
+      padding-top: 9px;
+      color: var(--cyan) !important;
+    }
+
     .footer {
       margin-top: 18px;
       color: var(--muted);
@@ -771,6 +870,14 @@
       .flow {
         grid-template-columns: repeat(2, 1fr);
       }
+
+      .case-head {
+        grid-template-columns: 1fr;
+      }
+
+      .backend-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
     @media (max-width: 680px) {
@@ -789,7 +896,9 @@
       }
 
       .flow,
-      .status {
+      .status,
+      .case-principles,
+      .backend-flow {
         grid-template-columns: 1fr;
       }
 
@@ -844,9 +953,10 @@
 
     <nav class="tabs" aria-label="大模块切换">
       <button class="tab active" data-tab="strategy"><strong>01 决策摘要</strong><small>Scope</small></button>
-      <button class="tab" data-tab="model"><strong>02 能力依据</strong><small>Benchmarks</small></button>
-      <button class="tab" data-tab="platform"><strong>03 落地方案</strong><small>Sub2API</small></button>
-      <button class="tab" data-tab="pilot"><strong>04 管理规则</strong><small>Control</small></button>
+      <button class="tab" data-tab="case"><strong>02 后端案例</strong><small>Usage</small></button>
+      <button class="tab" data-tab="model"><strong>03 能力依据</strong><small>Benchmarks</small></button>
+      <button class="tab" data-tab="platform"><strong>04 落地方案</strong><small>Sub2API</small></button>
+      <button class="tab" data-tab="pilot"><strong>05 管理规则</strong><small>Control</small></button>
     </nav>
 
     <section class="panel active" id="strategy">
@@ -889,6 +999,97 @@
             <div><b>入口统一</b><span>URL + Key 使用</span></div>
             <div><b>额度可调</b><span>按需求分配</span></div>
             <div><b>投入可控</b><span>先小范围承载</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="case">
+      <div class="case-layout">
+        <div class="case-head">
+          <article class="card">
+            <span class="label">后端使用案例</span>
+            <h2>把 AI 放进研发链路，而不是只当成问答工具</h2>
+            <p>后端场景的价值不在于让 AI 替代研发决策，而是把需求理解、方案初稿、代码生成、单测补齐、Review 和排障中的重复整理工作前置完成。研发人员仍负责判断边界、确认方案、审核代码和验证结果，但可以少花时间在资料翻译、初稿整理和低风险检查上。</p>
+            <div class="case-principles">
+              <div><b>为什么用</b><span>减少重复理解和手工整理，让研发把精力放在业务判断、系统设计和上线质量上。</span></div>
+              <div><b>如何使用</b><span>围绕 PRD、技术方案、代码、日志和测试结果发起任务，让 AI 先生成结构化初稿。</span></div>
+              <div><b>使用边界</b><span>AI 输出进入研发流程前必须由人复核，复杂方案、风险判断和最终上线决策不交给 AI。</span></div>
+            </div>
+          </article>
+          <article class="card">
+            <span class="label">条件与收益</span>
+            <h2>先在输入清楚的环节形成稳定收益</h2>
+            <div class="mini-table">
+              <div class="row"><b>输入条件</b><span>需求文档、历史实现、接口说明、日志和错误信息越完整，AI 输出越可复用。</span></div>
+              <div class="row"><b>已在使用</b><span>需求审查、果币重构与退款功能梳理、日常编码、AI Review 和问题分析已经具备实践基础。</span></div>
+              <div class="row"><b>直接收益</b><span>提升文档理解、技术方案初稿、编码、单测、Review 和排障的处理效率。</span></div>
+              <div class="row"><b>质量收益</b><span>补充边界场景、异常路径和风险点，帮助研发在开发前和提交前多做一轮检查。</span></div>
+            </div>
+          </article>
+        </div>
+
+        <article class="card">
+          <span class="label">研发阶段</span>
+          <h2>以一次后端需求为例：从需求到排障的 AI 介入点</h2>
+          <p>下面按后端研发阶段拆解“无 AI”和“使用 AI”之后的差异。核心不是把流程变复杂，而是在每个阶段让 AI 先完成可复用的整理、生成和检查，人再做确认与取舍。</p>
+          <div class="backend-flow" aria-label="后端研发阶段 AI 使用案例">
+            <div class="case-stage">
+              <div class="stage-index">01</div>
+              <h3>需求文档审查</h3>
+              <p><b>无 AI：</b>研发逐条阅读 PRD，通过评审和沟通确认业务规则、边界和待明确事项。</p>
+              <p><b>使用 AI：</b>先让 AI 提取业务逻辑、专用术语、异常分支和疑问点，再由研发补充判断。</p>
+              <p class="stage-goal"><b>目的：</b>减少误解和遗漏，让需求进入开发前先形成清晰口径。</p>
+              <p class="stage-practice">适用于日常产品需求文档审查。</p>
+            </div>
+            <div class="case-stage">
+              <div class="stage-index">02</div>
+              <h3>转化技术方案</h3>
+              <p><b>无 AI：</b>研发理解需求后手动整理技术文档、改动点和核心逻辑。</p>
+              <p><b>使用 AI：</b>把 PRD 转成技术语言，生成流程图、改动清单、核心逻辑和初版技术文档。</p>
+              <p class="stage-goal"><b>目的：</b>加快需求到技术方案的转换，提升开发前准备效率。</p>
+              <p class="stage-practice">已用于果币重构、退款功能等复杂需求梳理。</p>
+            </div>
+            <div class="case-stage">
+              <div class="stage-index">03</div>
+              <h3>设计调研与风险评估</h3>
+              <p><b>无 AI：</b>研发自行查历史实现、评估改造影响、补充风险和异常场景。</p>
+              <p><b>使用 AI：</b>提供系统背景和技术约束后，让 AI 生成方案选项、影响范围和风险清单。</p>
+              <p class="stage-goal"><b>目的：</b>提升方案产出效率，让评审更早看到关键取舍点。</p>
+              <p class="stage-practice">简单需求可快速产出初稿，复杂项目仍需研发主导。</p>
+            </div>
+            <div class="case-stage">
+              <div class="stage-index">04</div>
+              <h3>编码实现</h3>
+              <p><b>无 AI：</b>研发按技术方案逐步编写代码，再自行检查改动范围和实现细节。</p>
+              <p><b>使用 AI：</b>基于已完善的技术方案生成代码草稿、局部修改和接口适配。</p>
+              <p class="stage-goal"><b>目的：</b>减少重复编码时间，把精力放在关键逻辑和代码审核上。</p>
+              <p class="stage-practice">适用于日常编码、跨文件修改和已有逻辑补充。</p>
+            </div>
+            <div class="case-stage">
+              <div class="stage-index">05</div>
+              <h3>单元测试</h3>
+              <p><b>无 AI：</b>工程师手动编写单测、测试数据、边界场景和异常路径。</p>
+              <p><b>使用 AI：</b>根据实现逻辑补充单测、Mock 数据、边界条件和异常路径。</p>
+              <p class="stage-goal"><b>目的：</b>提高单测覆盖率，把容易遗漏的分支提前暴露出来。</p>
+              <p class="stage-practice">目标是把不足 30% 的覆盖率逐步提升到 80% 以上。</p>
+            </div>
+            <div class="case-stage">
+              <div class="stage-index">06</div>
+              <h3>Code Review</h3>
+              <p><b>无 AI：</b>审查人员逐行检查规范、异常处理、性能和可维护性。</p>
+              <p><b>使用 AI：</b>AI 先覆盖全部代码变更并生成 Review 报告，人工再复核重点逻辑。</p>
+              <p class="stage-goal"><b>目的：</b>把规范性、低复杂度和遗漏类问题提前筛出来。</p>
+              <p class="stage-practice">适合纳入提交前检查，复杂业务逻辑仍由人工判断。</p>
+            </div>
+            <div class="case-stage">
+              <div class="stage-index">07</div>
+              <h3>问题排查</h3>
+              <p><b>无 AI：</b>工程师复现问题、查日志、跟踪链路，再分析响应、资源和数据瓶颈。</p>
+              <p><b>使用 AI：</b>结合日志、错误信息、代码和性能数据，辅助定位原因并给出修复建议。</p>
+              <p class="stage-goal"><b>目的：</b>提升问题分析和方案生成速度，缩短查资料和排查路径。</p>
+              <p class="stage-practice">已用于问题分析和技术文档查阅，最终效果仍需验证。</p>
+            </div>
           </div>
         </article>
       </div>
@@ -1234,7 +1435,7 @@
     </section>
 
     <div class="footer">
-      资料来源：Artificial Analysis 公开 Dataset 数据、DataCurve DeepSWE 首页表格数据；Sub2API 功能说明基于本地测试环境。榜单、套餐和云服务器价格会变化，正式采购前以最新页面和内部确认结果为准。
+      资料来源：Artificial Analysis 公开 Dataset 数据、DataCurve DeepSWE 首页表格数据；后端 AI 使用案例基于内部实践文档整理；Sub2API 功能说明基于本地测试环境。榜单、套餐和云服务器价格会变化，正式采购前以最新页面和内部确认结果为准。
     </div>
   </main>
 
