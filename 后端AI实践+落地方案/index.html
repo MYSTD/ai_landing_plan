@@ -1,0 +1,2195 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>技术部门 AI落地实践与方案</title>
+  <style>
+    :root {
+      --bg: #05070d;
+      --panel: rgba(12, 18, 30, .82);
+      --panel-strong: rgba(15, 25, 42, .96);
+      --line: rgba(148, 163, 184, .22);
+      --line-strong: rgba(34, 211, 238, .46);
+      --text: #e5eefb;
+      --muted: #93a4b7;
+      --soft: #c9d7e8;
+      --cyan: #22d3ee;
+      --green: #34d399;
+      --blue: #60a5fa;
+      --amber: #fbbf24;
+      --violet: #a78bfa;
+      --danger: #fb7185;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(34, 211, 238, .17), transparent 28rem),
+        radial-gradient(circle at 82% 12%, rgba(167, 139, 250, .16), transparent 30rem),
+        linear-gradient(180deg, #05070d 0%, #07101d 48%, #05070d 100%);
+      letter-spacing: 0;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, .055) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .72), transparent 78%);
+    }
+
+    .app {
+      position: relative;
+      width: min(1480px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .hero {
+      display: block;
+      margin-bottom: 18px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(15, 23, 42, .86), rgba(8, 13, 24, .78));
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(255, 255, 255, .04);
+      backdrop-filter: blur(18px);
+      border-radius: var(--radius);
+    }
+
+    .hero-main {
+      padding: 34px 36px 30px;
+      min-height: 0;
+    }
+
+    .hero-side {
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cyan);
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    .pulse {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 980px;
+      color: var(--soft);
+      font-size: 20px;
+      line-height: 1.78;
+      margin: 0;
+    }
+
+    .decision {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+
+    .chip {
+      border: 1px solid rgba(34, 211, 238, .28);
+      background: rgba(34, 211, 238, .08);
+      color: #cffafe;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .metric {
+      border: 1px solid rgba(148, 163, 184, .2);
+      background: rgba(15, 23, 42, .66);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      padding: 10px 0 18px;
+      background: linear-gradient(180deg, rgba(5, 7, 13, .94) 0%, rgba(5, 7, 13, .78) 72%, transparent 100%);
+      backdrop-filter: blur(18px);
+    }
+
+    .tab {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, .74);
+      color: var(--soft);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      transition: .18s ease;
+    }
+
+    .tab strong {
+      color: #fff;
+    }
+
+    .tab.active {
+      border-color: var(--line-strong);
+      background: linear-gradient(135deg, rgba(34, 211, 238, .18), rgba(96, 165, 250, .12));
+      box-shadow: 0 0 32px rgba(34, 211, 238, .11);
+    }
+
+    .tab small {
+      color: var(--muted);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    #pilot .grid {
+      align-items: stretch;
+    }
+
+    #pilot .card {
+      height: 100%;
+    }
+
+    .card {
+      min-height: 242px;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .card.tall {
+      min-height: 348px;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      line-height: 1.22;
+      color: #fff;
+    }
+
+    .card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.68;
+    }
+
+    .card ul {
+      margin: 12px 0 0;
+      padding-left: 1.15em;
+      color: var(--soft);
+      line-height: 1.72;
+      font-size: 16px;
+    }
+
+    .card li {
+      margin: 6px 0;
+    }
+
+    .label {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 5px 9px;
+      color: var(--cyan);
+      border: 1px solid rgba(34, 211, 238, .24);
+      border-radius: 999px;
+      background: rgba(34, 211, 238, .07);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .step {
+      min-height: 104px;
+      border: 1px solid rgba(148, 163, 184, .19);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .035);
+      padding: 14px;
+    }
+
+    .step b {
+      display: block;
+      color: #fff;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .role-flow {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 118px;
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 14px;
+    }
+
+    .flow-track,
+    .role-track {
+      border: 1px solid rgba(96, 165, 250, .24);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .025);
+      padding: 12px;
+      min-height: 0;
+    }
+
+    .flow-title {
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .03em;
+      text-align: center;
+    }
+
+    .flow-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      height: 38px;
+      padding: 0 9px;
+      border: 1px solid rgba(56, 189, 248, .26);
+      border-radius: 10px;
+      background: rgba(56, 189, 248, .11);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .flow-lanes {
+      display: grid;
+      grid-template-rows: 58px 32px 58px 32px 58px 32px 58px;
+      align-items: center;
+      justify-items: stretch;
+      gap: 0;
+      height: auto;
+    }
+
+    .flow-connector,
+    .mini-connector {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      align-self: stretch;
+      min-height: 0;
+    }
+
+    .flow-connector::before,
+    .mini-connector::before {
+      content: "";
+      width: 2px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(125, 211, 252, .15), rgba(125, 211, 252, .9));
+    }
+
+    .flow-connector::after,
+    .mini-connector::after {
+      content: "";
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid rgba(125, 211, 252, .95);
+      border-bottom: 2px solid rgba(125, 211, 252, .95);
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .mini-connector {
+      margin: 0;
+    }
+
+    .role-stack {
+      display: grid;
+      grid-template-rows: 58px 32px 58px 32px 58px 32px 58px;
+      align-items: center;
+      gap: 0;
+      height: auto;
+    }
+
+    .role-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(96, 165, 250, .22);
+      border-radius: 12px;
+      background: rgba(96, 165, 250, .06);
+      padding: 14px 10px;
+      color: #fff;
+      text-align: center;
+    }
+
+    .role-card:nth-child(1) {
+      grid-row: 1 / span 3;
+      align-self: stretch;
+    }
+
+    .role-card:nth-child(2) {
+      grid-row: 5;
+      align-self: stretch;
+    }
+
+    .role-card:nth-child(3) {
+      grid-row: 7;
+      align-self: stretch;
+    }
+
+    .role-card b {
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .role-card span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .shot {
+      margin-top: 12px;
+      border: 1px solid rgba(148, 163, 184, .22);
+      border-radius: 14px;
+      overflow: auto;
+      background: #fff;
+      max-height: 520px;
+    }
+
+    .shot.compact {
+      max-height: 280px;
+    }
+
+    .shot.chart {
+      max-height: none;
+    }
+
+    .shot img {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: zoom-in;
+    }
+
+    .leaderboard-wrap {
+      margin-top: 12px;
+      border: 1px solid rgba(148, 163, 184, .22);
+      border-radius: 14px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 370px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      color: var(--soft);
+      font-size: 13px;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, .14);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .leaderboard-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(15, 23, 42, .96);
+      color: #fff;
+      font-size: 12px;
+      letter-spacing: .02em;
+    }
+
+    .leaderboard-table td:first-child,
+    .leaderboard-table th:first-child {
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .leaderboard-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .ranking-chart {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 10px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 28px minmax(145px, 1.1fr) minmax(120px, 1.6fr) 58px;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, .14);
+      color: var(--soft);
+      font-size: 12.5px;
+      min-width: 0;
+    }
+
+    .chart-row>span {
+      min-width: 0;
+    }
+
+    .chart-row:last-child {
+      border-bottom: 0;
+    }
+
+    .chart-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding-top: 0;
+      background: rgba(14, 21, 35, .98);
+      color: var(--muted);
+      font-size: 10.5px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .chart-head span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chart-rank {
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .chart-model {
+      min-width: 0;
+      overflow: hidden;
+      color: #fff;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chart-bar {
+      min-width: 0;
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, .15);
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .08);
+    }
+
+    .chart-fill {
+      display: block;
+      width: var(--w);
+      min-width: 8px;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, rgba(125, 211, 252, .72), rgba(56, 189, 248, .96));
+      box-shadow: 0 0 18px rgba(56, 189, 248, .22);
+    }
+
+    .chart-value {
+      color: #fff;
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .ranking-chart.deep {
+      min-width: 0;
+    }
+
+    .chart-row.deep {
+      grid-template-columns: 28px minmax(136px, 1.1fr) minmax(105px, 1.35fr) 70px 54px 48px 50px;
+      gap: 8px;
+    }
+
+    .chart-row.deep .chart-value,
+    .chart-meta {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .chart-meta {
+      color: var(--muted);
+      font-size: 11.5px;
+    }
+
+    .shot.full img {
+      min-width: 980px;
+    }
+
+    .caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 9px;
+    }
+
+    .caption a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    .card a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    .zoom-hint {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      background: rgba(2, 6, 23, .88);
+      backdrop-filter: blur(16px);
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox-inner {
+      position: relative;
+      width: min(96vw, 1500px);
+      max-height: 92vh;
+      border: 1px solid rgba(148, 163, 184, .32);
+      border-radius: 18px;
+      background: #fff;
+      overflow: auto;
+      box-shadow: 0 30px 110px rgba(0, 0, 0, .58);
+    }
+
+    .lightbox img {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-width: 1120px;
+    }
+
+    .lightbox-close {
+      position: fixed;
+      right: 34px;
+      top: 26px;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(226, 232, 240, .38);
+      border-radius: 50%;
+      background: rgba(15, 23, 42, .84);
+      color: #fff;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .lightbox-caption {
+      position: fixed;
+      left: 34px;
+      bottom: 24px;
+      color: var(--soft);
+      font-size: 13px;
+    }
+
+    .mini-table {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      align-items: start;
+      border: 1px solid rgba(148, 163, 184, .16);
+      background: rgba(255, 255, 255, .035);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .row b {
+      color: #fff;
+    }
+
+    .row span {
+      color: var(--soft);
+      line-height: 1.58;
+    }
+
+    .status {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .status div {
+      border: 1px solid rgba(148, 163, 184, .18);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .status b {
+      display: block;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .status span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .case-layout {
+      display: grid;
+      gap: 16px;
+    }
+
+    .case-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(340px, .82fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .case-principles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .case-principles div {
+      border-top: 1px solid rgba(34, 211, 238, .34);
+      padding-top: 12px;
+    }
+
+    .case-principles b {
+      display: block;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .case-principles span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .backend-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .case-stage {
+      position: relative;
+      min-height: 296px;
+      border: 1px solid rgba(148, 163, 184, .18);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .022));
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .case-stage::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(34, 211, 238, .86), rgba(96, 165, 250, .24));
+    }
+
+    .stage-index {
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      margin-bottom: 9px;
+    }
+
+    .case-stage h3 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 16px;
+      line-height: 1.34;
+    }
+
+    .case-stage p {
+      margin: 0 0 9px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.58;
+    }
+
+    .case-stage b {
+      color: var(--soft);
+    }
+
+    .stage-goal {
+      color: #dbeafe !important;
+    }
+
+    .stage-practice {
+      border-top: 1px solid rgba(148, 163, 184, .16);
+      padding-top: 9px;
+      color: var(--cyan) !important;
+    }
+
+    .story {
+      display: grid;
+      gap: 18px;
+    }
+
+    .story-lead,
+    .story-block,
+    .story-note {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(15, 23, 42, .82), rgba(8, 13, 24, .7));
+      box-shadow: 0 22px 70px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .035);
+      backdrop-filter: blur(18px);
+      border-radius: var(--radius);
+    }
+
+    .story-lead {
+      padding: 30px 34px;
+      border-color: rgba(34, 211, 238, .28);
+    }
+
+    .story-lead h2 {
+      margin: 0 0 14px;
+      color: #fff;
+      font-size: clamp(30px, 3.2vw, 48px);
+      line-height: 1.12;
+    }
+
+    .story-lead p {
+      max-width: 1020px;
+      margin: 0;
+      color: var(--soft);
+      font-size: 19px;
+      line-height: 1.78;
+    }
+
+    .story-lead p + p {
+      margin-top: 10px;
+    }
+
+    .story-block {
+      padding: 24px 28px;
+    }
+
+    .story-block h3 {
+      margin: 0 0 12px;
+      color: #fff;
+      font-size: 25px;
+      line-height: 1.25;
+    }
+
+    .story-block p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .story-rail {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .story-row {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      border-top: 1px solid rgba(148, 163, 184, .16);
+      padding-top: 14px;
+    }
+
+    .story-row:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .story-row b {
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .story-row span {
+      color: var(--soft);
+      line-height: 1.65;
+    }
+
+    .story-note {
+      padding: 18px 22px;
+      color: var(--soft);
+      line-height: 1.7;
+      border-color: rgba(52, 211, 153, .22);
+      background: linear-gradient(180deg, rgba(6, 78, 59, .16), rgba(8, 13, 24, .62));
+    }
+
+    .story-note b {
+      color: var(--green);
+    }
+
+    .story-image {
+      margin-top: 18px;
+      border: 1px solid rgba(148, 163, 184, .22);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .story-image img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .story-callout {
+      margin-top: 18px;
+      border: 1px solid rgba(34, 211, 238, .42);
+      border-left: 4px solid var(--cyan);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, .14), rgba(96, 165, 250, .08));
+      color: #fff;
+      padding: 18px 20px;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.55;
+    }
+
+    .model-list {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 0;
+      padding-left: 1.3em;
+      color: var(--soft);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .model-example {
+      margin-top: 18px !important;
+      border-top: 1px solid rgba(34, 211, 238, .24);
+      padding-top: 16px;
+      color: #cffafe !important;
+    }
+
+    .selection-result {
+      border: 1px solid rgba(251, 191, 36, .42);
+      border-left: 4px solid var(--amber);
+      background: linear-gradient(135deg, rgba(251, 191, 36, .14), rgba(34, 211, 238, .06));
+      color: #fff7ed;
+      padding: 22px 24px;
+      border-radius: 16px;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.72;
+    }
+
+    .pricing-image-table-wrap {
+      margin: 16px 0 20px;
+      border: 1px solid rgba(148, 163, 184, .3);
+      border-radius: 8px;
+      overflow-x: auto;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .pricing-image-table {
+      width: 100%;
+      min-width: 900px;
+      table-layout: fixed;
+      border-collapse: collapse;
+    }
+
+    .pricing-image-table td {
+      width: 33.333%;
+      padding: 10px;
+      border-right: 1px solid rgba(148, 163, 184, .3);
+      vertical-align: middle;
+      background: #fff;
+    }
+
+    .pricing-image-table td:last-child {
+      border-right: 0;
+    }
+
+    .pricing-image-table img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .proof-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .proof-strip div {
+      border: 1px solid rgba(148, 163, 184, .16);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .035);
+      padding: 14px;
+    }
+
+    .proof-strip b {
+      display: block;
+      color: #fff;
+      margin-bottom: 7px;
+    }
+
+    .proof-strip span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.58;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .timeline .case-stage {
+      min-height: auto;
+      padding-left: 24px;
+    }
+
+    .story .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .story .card,
+    .story .card.tall {
+      min-height: 0;
+    }
+
+    .story .leaderboard-wrap {
+      max-height: 430px;
+    }
+
+    .story .role-flow {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 140px;
+    }
+
+    .practice-table-wrap {
+      margin-top: 18px;
+      border: 1px solid rgba(148, 163, 184, .22);
+      border-radius: 16px;
+      overflow: auto;
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .practice-table {
+      width: 100%;
+      min-width: 960px;
+      border-collapse: collapse;
+      color: var(--soft);
+      font-size: 15.5px;
+      line-height: 1.62;
+    }
+
+    .practice-table th,
+    .practice-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, .14);
+      border-right: 1px solid rgba(148, 163, 184, .22);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .practice-table th:last-child,
+    .practice-table td:last-child {
+      border-right: 0;
+    }
+
+    .practice-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(15, 23, 42, .98);
+      color: #fff;
+      font-size: 14.5px;
+      white-space: nowrap;
+    }
+
+    .practice-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .practice-table td:first-child {
+      width: 150px;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .practice-table td:nth-child(2) {
+      color: var(--muted);
+    }
+
+    .practice-table td:nth-child(3) {
+      color: #dbeafe;
+    }
+
+    .practice-table td:nth-child(4) {
+      color: #cffafe;
+    }
+
+    .value-highlight {
+      color: var(--amber);
+      font-weight: 800;
+    }
+
+    .tab {
+      font-size: 16px;
+      justify-content: center;
+    }
+
+    .tabs {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .card h2 {
+      font-size: 25px;
+    }
+
+    .card p {
+      font-size: 16px;
+    }
+
+    .card ul {
+      font-size: 17px;
+    }
+
+    .row span {
+      font-size: 15px;
+    }
+
+    /* Readability theme for non-technical readers. */
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --panel-strong: #ffffff;
+      --line: rgba(30, 41, 59, .14);
+      --line-strong: rgba(15, 127, 140, .58);
+      --text: #1e293b;
+      --muted: #5f6b7a;
+      --soft: #344054;
+      --cyan: #0f7f8c;
+      --green: #18785a;
+      --blue: #2f6fbd;
+      --amber: #ad6200;
+      --violet: #7056a8;
+      --danger: #b23a50;
+      --radius: 8px;
+    }
+
+    body {
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    body::before {
+      display: none;
+    }
+
+    .app {
+      width: min(1240px, calc(100vw - 48px));
+      padding: 24px 0 40px;
+    }
+
+    .hero {
+      margin-bottom: 12px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .card,
+    .story-lead,
+    .story-block,
+    .story-note {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 6px 22px rgba(30, 41, 59, .07);
+      backdrop-filter: none;
+    }
+
+    .hero-main {
+      padding: 26px 32px 24px;
+      border-top: 4px solid var(--cyan);
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .pulse {
+      background: var(--green);
+      box-shadow: none;
+    }
+
+    h1 {
+      margin: 12px 0 2px;
+      color: #172033;
+      font-size: clamp(38px, 4vw, 54px);
+      line-height: 1.16;
+    }
+
+    .tabs {
+      gap: 8px;
+      padding: 10px 0 14px;
+      background: rgba(244, 246, 248, .96);
+      backdrop-filter: blur(12px);
+    }
+
+    .tab {
+      min-height: 48px;
+      padding: 12px 14px;
+      border-color: var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--soft);
+      box-shadow: none;
+      font-weight: 700;
+    }
+
+    .tab strong {
+      color: #263244;
+    }
+
+    .tab:hover {
+      border-color: rgba(15, 127, 140, .35);
+      background: #f4fbfc;
+    }
+
+    .tab.active {
+      border-color: rgba(15, 127, 140, .48);
+      background: #eaf6f7;
+      box-shadow: inset 0 -3px 0 var(--cyan);
+    }
+
+    .tab.active strong {
+      color: #0b6570;
+    }
+
+    .story {
+      gap: 14px;
+    }
+
+    .story-lead {
+      padding: 28px 32px;
+      border-color: var(--line);
+      border-left: 4px solid var(--cyan);
+    }
+
+    .story-lead h2 {
+      margin-bottom: 16px;
+      color: #1d2939;
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1.28;
+    }
+
+    .story-lead p {
+      max-width: none;
+      color: var(--soft);
+      font-size: 18px;
+      line-height: 1.78;
+    }
+
+    .story-lead p + p {
+      margin-top: 12px;
+    }
+
+    .story-block,
+    .card {
+      padding: 26px 28px;
+    }
+
+    .story-block h3,
+    .card h2 {
+      color: #1d2939;
+      font-size: 24px;
+      line-height: 1.35;
+    }
+
+    .story-block p,
+    .card p {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .label {
+      margin-bottom: 12px;
+      padding: 4px 8px;
+      border-color: #c5e5e8;
+      border-radius: 4px;
+      background: #edf8f9;
+      color: #0b6d78;
+      font-size: 12px;
+    }
+
+    .story-image {
+      width: min(100%, 780px);
+      margin: 24px auto 0;
+      border-color: #d3dae3;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(30, 41, 59, .08);
+    }
+
+    .story-callout {
+      margin-top: 20px;
+      padding: 18px 20px;
+      border-color: #9fd4da;
+      border-left: 5px solid var(--cyan);
+      border-radius: 6px;
+      background: #edf8f9;
+      color: #164f56;
+      font-size: 20px;
+      line-height: 1.6;
+      box-shadow: none;
+    }
+
+    .model-list {
+      margin-top: 14px;
+      padding: 16px 20px 16px 46px;
+      gap: 8px;
+      border: 1px solid #dbe1e8;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: var(--soft);
+      font-size: 17px;
+    }
+
+    .model-list li::marker {
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .model-example {
+      margin-top: 16px !important;
+      padding: 16px 18px;
+      border: 0;
+      border-left: 4px solid var(--blue);
+      border-radius: 4px;
+      background: #edf5fb;
+      color: #274766 !important;
+    }
+
+    .selection-result {
+      padding: 20px 22px;
+      border-color: #e5bd73;
+      border-left: 5px solid var(--amber);
+      border-radius: 6px;
+      background: #fff7e8;
+      color: #674205;
+      font-size: 19px;
+      line-height: 1.68;
+      box-shadow: none;
+    }
+
+    .practice-table-wrap,
+    .leaderboard-wrap,
+    .pricing-image-table-wrap {
+      border-color: #cfd7e1;
+      border-radius: 6px;
+      background: #ffffff;
+      box-shadow: none;
+    }
+
+    .practice-table {
+      min-width: 1080px;
+      color: #344054;
+      font-size: 15px;
+      line-height: 1.72;
+    }
+
+    .practice-table th,
+    .practice-table td {
+      padding: 16px 18px;
+      border-color: #d8dee7;
+    }
+
+    .practice-table th {
+      background: #edf1f5;
+      color: #1d2939;
+      font-size: 14px;
+    }
+
+    .practice-table tbody tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .practice-table td:first-child {
+      width: 160px;
+      color: #1d2939;
+      background: #f2f5f7;
+    }
+
+    .practice-table td:nth-child(2) {
+      color: #596579;
+    }
+
+    .practice-table td:nth-child(3) {
+      color: #274c77;
+    }
+
+    .practice-table td:nth-child(4) {
+      color: #155e67;
+    }
+
+    .value-highlight {
+      padding: 1px 3px;
+      border-radius: 3px;
+      background: #fff0ca;
+      color: #985600;
+    }
+
+    .leaderboard-wrap {
+      max-height: 460px;
+    }
+
+    .ranking-chart {
+      padding: 12px 16px;
+    }
+
+    .chart-row {
+      border-color: #e1e6ed;
+      color: #344054;
+      font-size: 13px;
+    }
+
+    .chart-head {
+      background: #edf1f5;
+      color: #667085;
+    }
+
+    .chart-rank {
+      color: var(--cyan);
+    }
+
+    .chart-model,
+    .chart-value {
+      color: #1d2939;
+    }
+
+    .chart-meta {
+      color: #667085;
+    }
+
+    .chart-bar {
+      background: #dce3eb;
+      box-shadow: none;
+    }
+
+    .chart-fill {
+      background: var(--blue);
+      box-shadow: none;
+    }
+
+    .caption {
+      color: #667085;
+      font-size: 13px;
+    }
+
+    .caption a,
+    .card a {
+      color: #0b6d78;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .mini-table {
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .row {
+      grid-template-columns: 160px minmax(0, 1fr);
+      gap: 16px;
+      padding: 14px 16px;
+      border-color: #dbe1e8;
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+
+    .row b {
+      color: #1d2939;
+    }
+
+    .row span {
+      color: #475467;
+      line-height: 1.65;
+    }
+
+    .pricing-image-table {
+      min-width: 780px;
+    }
+
+    .pricing-image-table td {
+      padding: 8px;
+      border-color: #d8dee7;
+    }
+
+    .pricing-image-table img {
+      aspect-ratio: 362 / 251;
+      object-fit: contain;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 1080px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .case-head {
+        grid-template-columns: 1fr;
+      }
+
+      .backend-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .app {
+        width: min(100vw - 22px, 1480px);
+        padding-top: 14px;
+      }
+
+      .hero-main {
+        padding: 24px;
+      }
+
+      .story-lead,
+      .story-block,
+      .card {
+        padding: 20px;
+      }
+
+      .story-lead p {
+        font-size: 17px;
+      }
+
+      .story-callout,
+      .selection-result {
+        padding: 16px;
+        font-size: 18px;
+      }
+
+      .tabs {
+        grid-template-columns: 1fr;
+        position: static;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .practice-table {
+        min-width: 920px;
+      }
+
+      .pricing-image-table {
+        min-width: 720px;
+      }
+
+      .flow,
+      .status,
+      .case-principles,
+      .backend-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .proof-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .story-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .role-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-track,
+      .role-track {
+        min-height: 0;
+      }
+
+      .role-stack {
+        grid-template-rows: repeat(3, minmax(72px, auto));
+        gap: 8px;
+      }
+
+      .role-card:nth-child(1),
+      .role-card:nth-child(2),
+      .role-card:nth-child(3) {
+        grid-row: auto;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="hero-main">
+        <div class="eyebrow"><span class="pulse"></span> Internal R&D Tool Proposal</div>
+        <h1>技术部门 AI落地实践与方案</h1>
+<!--         <p class="hero-copy">后端团队已经先行验证了 ChatGPT/Codex 在研发链路中的效率价值。本方案建议把这类已验证有效的 AI 使用纳入公司统一入口，通过
+          Sub2API 管理账号池、API Key、额度和 IP 边界，并为前端、数据后续接入保留统一路径。</p> -->
+<!--         <div class="decision">
+          <span class="chip">后端已先行落地</span>
+          <span class="chip">前端/数据规划接入</span>
+          <span class="chip">2-3 个 Pro 账号起步</span>
+          <span class="chip">额度/IP 可控</span>
+        </div> -->
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="大模块切换">
+      <button class="tab active" data-tab="strategy"><strong>01 为什么用 AI</strong></button>
+      <button class="tab" data-tab="case"><strong>02 后端实践结果</strong></button>
+      <button class="tab" data-tab="model"><strong>03 AI 选型</strong></button>
+      <button class="tab" data-tab="platform"><strong>04 落地接入方案</strong></button>
+      <!-- <button class="tab" data-tab="pilot"><strong>05 管理与预算规则</strong></button> -->
+    </nav>
+
+    <section class="panel active" id="strategy">
+      <div class="story">
+        <article class="story-lead">
+          <h2>AI 编程工具正在进入研发生产场景</h2>
+          <p>2025 年开始，AI 作为编程工具逐渐引入到企业内部的生产环境中。到 2025 年 11 月，随着模型升级和发布，越来越多的人开始认可 AI 已经能在生产中发挥较大的作用。2026 年至今，随着模型进一步更新，模型的理解能力和编程能力进一步增强。</p>
+          <p>随之而来的是开发者对使用 AI 编程工具的观点也开始分化：有人坚持排斥，有人谨慎接受，也有人已经把 AI 当作提升生产力的主力工具。</p>
+          <div class="story-image">
+            <img src="assets/vibe-coding-developer-types.png" alt="Vibe Coding 时代几种程序员流派">
+          </div>
+          <div class="story-callout">根据我们目前的实践，我们当前处在半维新派和维新派之间，我们是切实感受到ai带来的能力和效率提升的
+                    <p>为什么不是维新派： 极致的AI使用成本花费巨大，需要用明确的目标和方向。</p>
+                    <div class="story-image">
+                      <img src="assets/token-quota-management-example.png" alt="企业内部 AI Token 额度分配与管理案例">
+                    </div>
+</div>
+
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel" id="case">
+      <div class="story">
+        <article class="story-block">
+          <h3>使用 AI 前后的后端研发流程对比</h3>
+          <div class="practice-table-wrap" aria-label="后端实践结果对比表">
+            <table class="practice-table">
+              <thead>
+                <tr>
+                  <th>研发阶段</th>
+                  <th>使用 AI 前</th>
+                  <th>使用 AI 后</th>
+                  <th>实践成果 / 目标 / 价值</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>需求文档审查</td>
+                  <td>研发人员阅读产品需求，通过评审和沟通确认业务规则、实现边界及待明确事项。</td>
+                  <td>AI 阅读文档，明确业务逻辑，转化成业务名词和专用术语，并辅助做规范性、合理性审查。</td>
+                  <td>已用于日常产品需求文档审查；目标是统一审查文档规范性和合理性，对齐业务边界，<span class="value-highlight">减少错误理解和分歧</span>。</td>
+                </tr>
+                <tr>
+                  <td>需求文档转化为技术方案和技术文档</td>
+                  <td>技术人员理解需求文档，编写技术文档，在开发前梳理变更点以及开发的核心逻辑。</td>
+                  <td>AI 将需求文档转化成技术语言版本的需求文档，例如流程图、改动点、核心业务逻辑等，为开发做好准备。</td>
+                  <td>已用于果币重构 + 退款功能中的复杂业务梳理；目标是基于历史数据和原有技术实现快速生成初版技术文档，<span class="value-highlight">加快开发对需求的理解，提升开发前准备效率</span>。</td>
+                </tr>
+                <tr>
+                  <td>技术实现设计、调研与风险评估</td>
+                  <td>开发根据需求文档和技术目标进行技术方案设计、调研和风险评估。</td>
+                  <td>开发提供系统背景和技术约束，AI 辅助生成方案、分析影响范围、补充风险点和异常场景，再由开发沟通并最终决策。</td>
+                  <td>简单需求已能较快产出技术实现和风险评估，<span class="value-highlight">技术调研速度有明显提升</span>；复杂项目仍由人重点把控，目标是<span class="value-highlight">提升方案合理性和产出效率</span>。</td>
+                </tr>
+                <tr>
+                  <td>编码实现</td>
+                  <td>开发根据技术方案和文档编写代码。</td>
+                  <td>AI 根据已完善的技术方案和文档编写代码，开发审核代码并确定实现的合理性和有效性。</td>
+                  <td>已用于日常编码工作；目标是<span class="value-highlight">减少重复编码和样板代码耗时，提升编码效率</span>，同时保留开发对实现质量的判断。</td>
+                </tr>
+                <tr>
+                  <td>单元测试</td>
+                  <td>工程师根据实现逻辑编写单元测试、测试数据和异常场景，并运行测试验证代码。</td>
+                  <td>AI 辅助生成单元测试、模拟数据、边界场景和异常路径，工程师负责确认测试是否符合真实需求。</td>
+                  <td>原有单测覆盖率不足 30%，AI 介入后目标提升至 80% 以上；覆盖率提升可以<span class="value-highlight">有效降低 bug 率</span>，也能<span class="value-highlight">减少测试用例设计和补测成本，提高测试工作效率</span>。</td>
+                </tr>
+                <tr>
+                  <td>Code Review</td>
+                  <td>审查人员逐行检查代码规范、实现逻辑、异常处理、性能和可维护性。</td>
+                  <td>AI 先进行 Review 并覆盖全部代码变更，生成 Review 报告后再由人工复核。</td>
+                  <td>目标是推动 Review 流程自动化并生成标准化 Review 报告；代码规范性和非复杂逻辑先由 AI <span class="value-highlight">提高 Review 效率</span>，人工重点复核复杂逻辑和业务判断。</td>
+                </tr>
+                <tr>
+                  <td>问题排查</td>
+                  <td>工程师复现问题、查看日志、跟踪程序运行过程，并分析响应速度、资源使用和数据处理瓶颈。</td>
+                  <td>AI 结合日志、错误信息、代码和性能数据，辅助分析问题原因并给出修复或优化建议。</td>
+                  <td>已通过AI进行问题分析，<span class="value-highlight">提高技术文档查阅和排查的速度</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="panel" id="model">
+      <div class="story">
+        <article class="story-lead">
+          <h2>后端的AI选型</h2>
+          <p>后端使用过的AI模型如下： Deepseek,千问，智谱GLM, MiniMax, Codex(gpt)， Grok(马斯克）， Gemini</p>
+          <p>好模型和差模型，在使用体验上的差异体现在：</p>
+          <ol class="model-list">
+            <li>能更好的预测你想要什么（AI本质上是一个预测模型）</li>
+            <li>在复杂项目的沟通中犯错更少，且始终聚焦目标。</li>
+            <li>更少的幻觉和以及纠正幻觉的准确率。</li>
+            <li>成本合理</li>
+          </ol>
+          <p class="model-example">这些差异会非常影响使用ai的效率。举例来说，和ai沟通一个改动，一次改完，ai的思考和实施时间可能是3分钟，但如果有问题，要再沟通进行调整，时间可能就是6分钟，时间代价加倍了。</p>
+          <p class="model-example">近期国产ai的能力虽然有提升，但在编程方面的工作上的能力和Codex相比仍有差距，另外一个我们关注的点则是成本。以Codex为例，Codex团队包月的一个名额，费用在30美元，国产比如阿里云的Qoder则是300元。</p>          
+          <p class="model-example">综上我们目前考虑使用国外的模型来承载我们的开发工作。当然这不是说Codex一定是很长期的方案，如果模型的能力和价格发生变化，我们也会进行评估和调整</p>
+        </article>
+
+        <div class="grid">
+        <article class="card tall">
+          <span class="label">公开榜单参考 · Intelligence Index</span>
+          <h2>综合能力：判断是否值得作为主工具</h2>
+          <p>Artificial Analysis 的 Intelligence Index 用来观察模型在数学、科学、编码、推理等多类任务上的整体水平。当前公开数据中，Claude Fable 5、Claude Opus 4.8 与 GPT-5.5 位于前列，可作为选择 ChatGPT/Codex 主线时的外部参考。</p>
+          <div class="leaderboard-wrap" aria-label="Artificial Analysis Intelligence Index chart">
+            <div class="ranking-chart">
+              <div class="chart-row chart-head">
+                <span>#</span><span>Model</span><span>Relative score</span><span>Index</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">1</span><span class="chart-model">Claude Fable 5 (with fallback)</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 100%"></span></span><span class="chart-value">59.86</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">2</span><span class="chart-model">Claude Opus 4.8 (max)</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 93%"></span></span><span class="chart-value">55.69</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">3</span><span class="chart-model">GPT-5.5 (xhigh)</span><span class="chart-bar"><span class="chart-fill openai" style="--w: 92%"></span></span><span class="chart-value">54.84</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">4</span><span class="chart-model">Claude Opus 4.7 (max)</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 89%"></span></span><span class="chart-value">53.53</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">5</span><span class="chart-model">GPT-5.5 (high)</span><span class="chart-bar"><span class="chart-fill openai" style="--w: 89%"></span></span><span class="chart-value">53.13</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">6</span><span class="chart-model">GLM-5.2 (max)</span><span class="chart-bar"><span class="chart-fill" style="--w: 85%"></span></span><span class="chart-value">51.09</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">7</span><span class="chart-model">Gemini 3.5 Flash</span><span class="chart-bar"><span class="chart-fill google" style="--w: 84%"></span></span><span class="chart-value">50.20</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">8</span><span class="chart-model">Claude Sonnet 4.6 (max)</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 79%"></span></span><span class="chart-value">47.21</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">9</span><span class="chart-model">Gemini 3.1 Pro Preview</span><span class="chart-bar"><span class="chart-fill google" style="--w: 78%"></span></span><span class="chart-value">46.46</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">10</span><span class="chart-model">Qwen3.7 Max</span><span class="chart-bar"><span class="chart-fill" style="--w: 77%"></span></span><span class="chart-value">45.99</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">11</span><span class="chart-model">MiniMax-M3</span><span class="chart-bar"><span class="chart-fill" style="--w: 74%"></span></span><span class="chart-value">44.44</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">12</span><span class="chart-model">DeepSeek V4 Pro (Max)</span><span class="chart-bar"><span class="chart-fill deepseek" style="--w: 74%"></span></span><span class="chart-value">44.27</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">13</span><span class="chart-model">Muse Spark</span><span class="chart-bar"><span class="chart-fill" style="--w: 72%"></span></span><span class="chart-value">43.06</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">14</span><span class="chart-model">Kimi K2.6</span><span class="chart-bar"><span class="chart-fill" style="--w: 72%"></span></span><span class="chart-value">42.84</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">15</span><span class="chart-model">MiMo-V2.5-Pro</span><span class="chart-bar"><span class="chart-fill" style="--w: 71%"></span></span><span class="chart-value">42.24</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">16</span><span class="chart-model">DeepSeek V4 Flash (Max)</span><span class="chart-bar"><span class="chart-fill deepseek" style="--w: 67%"></span></span><span class="chart-value">40.28</span>
+              </div>
+            </div>
+          </div>
+          <div class="caption"><span>来源：Artificial Analysis Intelligence Index Dataset · 访问日期 2026-06-23</span><a
+              href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" target="_blank">网站链接</a>
+          </div>
+        </article>
+        <article class="card tall">
+          <span class="label">公开榜单参考 · Coding Index</span>
+          <h2>编程能力：对应研发高频工作</h2>
+          <p>Coding Index 主要看模型在代码相关基准上的表现，和本方案的使用对象更接近。当前公开数据中 Claude Fable 5、GPT-5.5 与 Claude Opus 4.8 位于前列，为研发工具选型提供能力参考。</p>
+          <div class="leaderboard-wrap" aria-label="Artificial Analysis Coding Index chart">
+            <div class="ranking-chart">
+              <div class="chart-row chart-head">
+                <span>#</span><span>Model</span><span>Relative score</span><span>Index</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">1</span><span class="chart-model">Claude Fable 5 (with fallback)</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 100%"></span></span><span class="chart-value">76.49</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">2</span><span class="chart-model">GPT-5.5 (xhigh)</span><span class="chart-bar"><span class="chart-fill openai" style="--w: 98%"></span></span><span class="chart-value">74.89</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">3</span><span class="chart-model">Claude Opus 4.8 (max)</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 97%"></span></span><span class="chart-value">74.25</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">4</span><span class="chart-model">Gemini 3.5 Flash</span><span class="chart-bar"><span class="chart-fill google" style="--w: 92%"></span></span><span class="chart-value">70.14</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">5</span><span class="chart-model">Gemini 3.1 Pro Preview</span><span class="chart-bar"><span class="chart-fill google" style="--w: 90%"></span></span><span class="chart-value">68.83</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">6</span><span class="chart-model">GLM-5.2 (max)</span><span class="chart-bar"><span class="chart-fill" style="--w: 90%"></span></span><span class="chart-value">68.76</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">7</span><span class="chart-model">Qwen3.7 Max</span><span class="chart-bar"><span class="chart-fill" style="--w: 86%"></span></span><span class="chart-value">65.97</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">8</span><span class="chart-model">Claude Sonnet 4.6 (max)</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 82%"></span></span><span class="chart-value">63.03</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">9</span><span class="chart-model">MiMo-V2.5-Pro</span><span class="chart-bar"><span class="chart-fill" style="--w: 79%"></span></span><span class="chart-value">60.19</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">10</span><span class="chart-model">DeepSeek V4 Pro (Max)</span><span class="chart-bar"><span class="chart-fill deepseek" style="--w: 78%"></span></span><span class="chart-value">59.36</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">11</span><span class="chart-model">Muse Spark</span><span class="chart-bar"><span class="chart-fill" style="--w: 77%"></span></span><span class="chart-value">58.62</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">12</span><span class="chart-model">MiniMax-M3</span><span class="chart-bar"><span class="chart-fill" style="--w: 77%"></span></span><span class="chart-value">58.57</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">13</span><span class="chart-model">DeepSeek V4 Flash (Max)</span><span class="chart-bar"><span class="chart-fill deepseek" style="--w: 73%"></span></span><span class="chart-value">56.17</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">14</span><span class="chart-model">GPT-5.4 mini (xhigh)</span><span class="chart-bar"><span class="chart-fill openai" style="--w: 73%"></span></span><span class="chart-value">56.08</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">15</span><span class="chart-model">Kimi K2.6</span><span class="chart-bar"><span class="chart-fill" style="--w: 73%"></span></span><span class="chart-value">56.03</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-rank">16</span><span class="chart-model">Nemotron 3 Ultra</span><span class="chart-bar"><span class="chart-fill" style="--w: 64%"></span></span><span class="chart-value">49.27</span>
+              </div>
+            </div>
+          </div>
+          <div class="caption"><span>来源：Artificial Analysis Coding Index Dataset · 访问日期 2026-06-23</span><a
+              href="https://artificialanalysis.ai/models/capabilities/coding" target="_blank">网站链接</a>
+          </div>
+        </article>
+        <article class="card tall">
+          <span class="label">公开榜单参考 · DeepSWE</span>
+          <h2>工程任务：看真实修复能力</h2>
+          <p>DeepSWE 更接近日常研发里的真实问题：理解仓库、定位原因、修改代码、跑通验证。官方 v1.1 榜单显示，Claude Fable 5 [max] 的 Pass@1 为 70% ±4%，GPT-5.5 [xhigh] 为 67% ±6%，并展示了 Claude、Gemini、Kimi、GLM 等模型的横向对比。</p>
+          <div class="leaderboard-wrap" aria-label="DataCurve DeepSWE leaderboard chart">
+            <div class="ranking-chart deep">
+              <div class="chart-row chart-head deep">
+                <span>#</span><span>Model</span><span>Pass@1 bar</span><span>Pass@1</span><span>Cost</span><span>Out tok</span><span>Steps</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">1</span><span class="chart-model">claude-fable-5 [max]</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 100%"></span></span><span class="chart-value">70% ±4%</span><span class="chart-meta">$21.63</span><span class="chart-meta">119k</span><span class="chart-meta">88</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">2</span><span class="chart-model">gpt-5.5 [xhigh]</span><span class="chart-bar"><span class="chart-fill openai" style="--w: 96%"></span></span><span class="chart-value">67% ±6%</span><span class="chart-meta">$7.23</span><span class="chart-meta">46k</span><span class="chart-meta">82</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">3</span><span class="chart-model">claude-opus-4.8 [max]</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 84%"></span></span><span class="chart-value">59% ±2%</span><span class="chart-meta">$13.22</span><span class="chart-meta">135k</span><span class="chart-meta">120</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">4</span><span class="chart-model">gpt-5.4 [xhigh]</span><span class="chart-bar"><span class="chart-fill openai" style="--w: 74%"></span></span><span class="chart-value">52% ±2%</span><span class="chart-meta">$5.65</span><span class="chart-meta">71k</span><span class="chart-meta">70</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">5</span><span class="chart-model">glm-5.2 [max]</span><span class="chart-bar"><span class="chart-fill" style="--w: 63%"></span></span><span class="chart-value">44% ±2%</span><span class="chart-meta">$3.92</span><span class="chart-meta">78k</span><span class="chart-meta">129</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">6</span><span class="chart-model">gemini-3.5-flash [medium]</span><span class="chart-bar"><span class="chart-fill google" style="--w: 53%"></span></span><span class="chart-value">37% ±2%</span><span class="chart-meta">$7.34</span><span class="chart-meta">276k</span><span class="chart-meta">86</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">7</span><span class="chart-model">kimi-k2.7-code</span><span class="chart-bar"><span class="chart-fill" style="--w: 44%"></span></span><span class="chart-value">31% ±1%</span><span class="chart-meta">$2.82</span><span class="chart-meta">59k</span><span class="chart-meta">149</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">8</span><span class="chart-model">claude-sonnet-4.6 [high]</span><span class="chart-bar"><span class="chart-fill anthropic" style="--w: 43%"></span></span><span class="chart-value">30% ±4%</span><span class="chart-meta">$5.52</span><span class="chart-meta">76k</span><span class="chart-meta">134</span>
+              </div>
+              <div class="chart-row deep">
+                <span class="chart-rank">9</span><span class="chart-model">gemini-3.1-pro [high]</span><span class="chart-bar"><span class="chart-fill google" style="--w: 17%"></span></span><span class="chart-value">12% ±2%</span><span class="chart-meta">$9.48</span><span class="chart-meta">196k</span><span class="chart-meta">81</span>
+              </div>
+            </div>
+          </div>
+          <div class="caption"><span>来源：DataCurve DeepSWE Leaderboard v1.1 · Updated June 20, 2026 · Models 9/9</span><a
+              href="https://deepswe.datacurve.ai/" target="_blank">网站链接</a></div>
+        </article>
+      </div>
+        <div class="selection-result">基于综合能力和编程能力的考量，chatgpt和Claude在模型能力方面都是达标的，但Claude 在价格方面并不友好，所以我们考虑的选型方案是chatgpt</div>
+      </div>
+    </section>
+
+    <section class="panel" id="platform">
+      <div class="story">
+        <article class="story-lead">
+          <h2>落地方案：高额度账号采购 + 中间站分发</h2>
+          <p>1、高额度账号的单价更便宜， 用量受到的限制更小</p>
+          <div class="pricing-image-table-wrap">
+            <table class="pricing-image-table" aria-label="ChatGPT 套餐价格对比">
+              <tbody>
+                <tr>
+                  <td><img src="assets/chatgpt-plus-20.png" alt="ChatGPT Plus 20 美元套餐"></td>
+                  <td><img src="assets/chatgpt-pro-100.png" alt="ChatGPT Pro 100 美元套餐"></td>
+                  <td><img src="assets/chatgpt-pro-200.png" alt="ChatGPT Pro 200 美元套餐"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>2、中间站统一分发</p>
+          <p>通过中间站将账号额度分发给不同的用户。目前以 ChatGPT/Codex 为主，后续扩展国内模型时不需要重新改变员工使用入口。</p>
+          <div class="mini-table">
+            <div class="row"><b>账号池</b><span>首期统一接入 ChatGPT/Codex 账号，按状态、额度和可用性进行调度。</span></div>
+            <div class="row"><b>渠道池</b><span>支持接入 OpenAI 接口格式的 API Key，例如 DeepSeek V4、GLM-5.1 等国内模型或其他兼容接口服务。</span></div>
+            <div class="row"><b>Key 分发</b><span>按部门、小组或个人发放独立 API Key，员工仍使用统一 URL 和个人 Key。</span></div>
+            <div class="row"><b>额度/IP</b><span>支持单 Key 启停、额度上限、IP 限制和后续动态调整。</span></div>
+            <div class="row"><b>用量依据</b><span>按 Key 查看请求、Token 和消耗趋势，为加账号、调额度或接新渠道提供依据。</span></div>
+          </div>
+          <!-- <p>中间站成本：海外阿里云服务器一台，预计10$/月</p> -->
+
+        </article>
+
+        <div class="grid">
+        <article class="card">
+          <span class="label">上线路径</span>
+          <h2>四步完成内部接入</h2>
+          <!-- <p>方案尽量保持轻：一台海外云服务器部署 Sub2API，接入 2-3 个 ChatGPT Pro 账号，再向技术部门分发内部 API Key。</p> -->
+          <div class="mini-table">
+            <div class="row"><b>1. 中间站服务器</b><span>海外低配云服务器一台吗，预计10$/月</span></div>
+            <div class="row"><b>2. 账号</b><span>准备 2-3 个 ChatGPT Pro 账号。公开价格口径约 $200/账号/月，首批账号预算约 $400-$600/月。</span></div>
+            <div class="row"><b>3. 号池/渠道池</b><span>把 ChatGPT 账号先导入 Sub2API，后续也可接入 OpenAI 格式的 API Key 渠道，由平台统一调度、统计和分发。</span>
+            </div>
+            <div class="row"><b>4. 使用</b><span>员工在 Codex/Cockpit 中填写统一 URL 和个人 Key。后续按实际消耗调整人员或部门额度。</span>
+            </div>
+          </div>
+<!--           <p style="margin-top:14px">价格按 <a href="https://www.alibabacloud.com/zh/product/swas/pricing?_p_lc=1"
+              target="_blank">阿里云公开价格页</a> 和 <a href="https://openai.com/chatgpt/pricing/" target="_blank">OpenAI
+              价格页</a> 估算，正式采购前以实际下单页为准。</p> -->
+        </article>
+        <article class="card">
+          <span class="label">采购路径</span>
+          <h2>采购方式与风险口径</h2>
+          <p>账号来源会影响接入速度、成本和后续维护。考虑到当前需要尽快落地，建议首期优先采用现有相对稳定的第三方代充渠道，先把账号接入 Sub2API 统一分发；官方直购可作为后续长期路径继续评估。</p>
+          <div class="mini-table">
+            <div class="row"><b>官方直购</b><span>稳定性和账号归属最清晰，但通常需要海外银行卡、海外账单地址和可用网络环境，前期办理周期和沟通成本较高。</span></div>
+            <div class="row"><b>第三方代充</b><span>落地速度较快，适合首期优先采用。目前已有相对稳定的渠道，重点是把采购、续费和异常处理放到统一管理口径内，同时保留价格波动和账号风控的预案。</span></div>
+            <div class="row"><b>风险说明</b><span>ChatGPT 不属于面向中国大陆开放使用的官方服务，访问和使用存在一定不确定性。内部自用、统一入口、限制范围的风险口径，可参考公司对海外 VPN 或海外 SaaS 工具的管理方式处理。</span></div>
+          </div>
+          <p style="margin-top:14px">正式采购前以 <a
+              href="https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories"
+              target="_blank">OpenAI 官方支持地区</a> 和公司内部合规意见为准，首期按内部研发工具管理，不做公众开放或对外销售。</p>
+        </article>
+        <!-- <article class="card">
+          <span class="label">流程分工</span>
+          <h2>接入流程与运行维护</h2>
+          <p>下图把一次性接入和后续维护拆开看，右侧对应每一段的负责角色。员工侧不改变主要工作流，拿到 Key 后直接使用。</p>
+          <div class="role-flow" aria-label="Sub2API 落地流程与角色分工">
+            <div class="flow-track">
+              <div class="flow-title">资源接入流程</div>
+              <div class="flow-lanes">
+                <div class="flow-node">模型采购</div>
+                <div class="mini-connector"></div>
+                <div class="flow-node">导入账号池 / Key 池</div>
+                <div class="flow-connector"></div>
+                <div class="flow-node">分发个人 API Key</div>
+                <div class="flow-connector"></div>
+                <div class="flow-node">员工配置使用</div>
+              </div>
+            </div>
+            <div class="flow-track">
+              <div class="flow-title">运行维护流程</div>
+              <div class="flow-lanes">
+                <div class="flow-node">号池维护</div>
+                <div class="mini-connector"></div>
+                <div class="flow-node">异常处理</div>
+                <div class="flow-connector"></div>
+                <div class="flow-node">额度分发 / 动态调整 / IP 管控</div>
+                <div class="flow-connector"></div>
+                <div class="flow-node">使用 AI 完成研发产出</div>
+              </div>
+            </div>
+            <div class="role-track">
+              <div class="flow-title">角色</div>
+              <div class="role-stack">
+                <div class="role-card"><b>管理员</b><span>采购 / 导入 / 维护</span></div>
+                <div class="role-card"><b>组长</b><span>额度分发/IP管控</span></div>
+            <div class="role-card"><b>员工</b><span>使用 / 产出</span></div>
+              </div>
+            </div>
+          </div>
+        </article> -->
+      </div>
+      </div>
+    </section>
+
+    <!-- 05 管理与预算规则
+    <section class="panel" id="pilot">
+      <div class="story">
+        <article class="story-lead">
+          <h2>统一入口的关键不是多买账号，而是把权限、额度、异常和预算管起来</h2>
+          <p>Sub2API 作为内部研发工具入口，管理方式按管理员、组长、员工三类角色拆开。额度不平均分配，而是根据 Key 消耗、Token 用量和异常记录动态调整；正式采购前需复核套餐价格、云服务器价格和内部合规意见。</p>
+        </article>
+
+        <div class="grid">
+        <article class="card">
+          <span class="label">管理计划</span>
+          <h2>角色职责与管理边界</h2>
+          <p>Sub2API 作为统一入口，管理方式不按个人自发采购处理，而是按管理员、组长、员工三类角色拆开。这样既能保证入口稳定，也能把额度、权限和异常处理落到具体责任人。</p>
+          <div class="mini-table">
+            <div class="row"><b>管理员</b><span>负责模型采购、导入账号池或 Key 池，维护号池健康状态，并处理上游账号异常。</span></div>
+            <div class="row"><b>组长</b><span>负责组内 API Key 发放、额度分发、动态调整和 IP 管控，按实际使用情况向管理员反馈需求。</span></div>
+            <div class="row"><b>员工</b><span>只需要使用统一 URL 和个人 API Key，在 Codex/Cockpit 中完成研发任务，不接触上游账号密码。</span></div>
+            <div class="row"><b>调整依据</b><span>根据 Key 消耗、Token 用量和异常记录决定是否加额度、停用 Key 或增加账号。</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <span class="label">额度策略</span>
+          <h2>额度按实际使用动态调整</h2>
+          <p>额度不做平均分配，先给各小组基础额度，再根据实际消耗和岗位需求做倾斜。这样能避免高频使用人员不够用，也能减少低频账号长期占用预算。</p>
+          <div class="mini-table">
+            <div class="row"><b>基础额度</b><span>覆盖日常研发使用，保证每个小组都有可用入口。</span></div>
+            <div class="row"><b>高频倾斜</b><span>用量较高的小组或人员，可以单独提高额度上限。</span></div>
+            <div class="row"><b>消耗监控</b><span>按 Key 查看请求量、Token 和消耗趋势，作为调整依据。</span></div>
+            <div class="row"><b>异常处理</b><span>异常流量可以限额、停用或绑定公司出口 IP。</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <span class="label">边界控制</span>
+          <h2>使用边界保持清晰</h2>
+          <p>服务只用于技术部门内部研发场景，不开放公众注册，也不做 Key 对外销售。统一入口的价值，是把账号、权限、额度和停用规则放到可管理的位置。</p>
+          <div class="mini-table">
+            <div class="row"><b>开放范围</b><span>只面向技术部门内部使用，不开放公众注册，不对外销售 Key。</span></div>
+            <div class="row"><b>账号安全</b><span>员工只使用个人 API Key，不共享上游账号密码。</span></div>
+            <div class="row"><b>数据规范</b><span>核心代码、客户数据和个人信息按公司既有规范处理。</span></div>
+            <div class="row"><b>异常收口</b><span>发现异常使用时，可按 Key 限额、停用或绑定公司出口 IP。</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <span class="label">首月预算</span>
+          <h2>20 人以内先按轻量成本试运行</h2>
+          <p>Sub2API 本身资源占用不高，20 人左右使用可以先选择海外低配云服务器，把主要预算放在 ChatGPT Pro（20x）账号上。首月先按 2-3 个账号估算，后续根据 Key 消耗再调整。</p>
+          <div class="mini-table">
+            <div class="row"><b>账号预算</b><span>2-3 个 ChatGPT Pro 账号，约 $400-$600/月。</span></div>
+            <div class="row"><b>服务器</b><span>海外低配云服务器，公开价格约 $4.5-$15/月。</span></div>
+            <div class="row"><b>首月合计</b><span>按当前口径估算约 ¥3000-4500/月。</span></div>
+            <div class="row"><b>后续调整</b><span>根据 Key 消耗趋势决定是否增加账号或调整额度。</span></div>
+          </div>
+          <p style="margin-top:14px">估算基于 ChatGPT Pro $200/账号/月、阿里云海外轻量服务器公开低配价格；未包含第三方代充溢价、税费和汇率波动。</p>
+        </article>
+      </div>
+      </div>
+    </section>
+    -->
+
+    <div class="footer">
+      资料来源：Artificial Analysis 公开 Dataset 数据、DataCurve DeepSWE 首页表格数据；后端 AI 使用案例基于内部实践文档整理；Sub2API 功能说明基于本地测试环境。榜单、套餐和云服务器价格会变化，正式采购前以最新页面和内部确认结果为准。
+    </div>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox-close" type="button" aria-label="关闭">×</button>
+    <div class="lightbox-inner">
+      <img src="" alt="">
+    </div>
+    <div class="lightbox-caption">点击空白处或按 Esc 关闭</div>
+  </div>
+
+  <script>
+    const tabs = [...document.querySelectorAll(".tab")];
+    const panels = [...document.querySelectorAll(".panel")];
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.tab;
+        tabs.forEach(t => t.classList.toggle("active", t === tab));
+        panels.forEach(panel => panel.classList.toggle("active", panel.id === target));
+      });
+    });
+
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = lightbox.querySelector("img");
+    const closeLightbox = () => {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImg.removeAttribute("src");
+      lightboxImg.removeAttribute("alt");
+    };
+    document.querySelectorAll(".shot img").forEach(img => {
+      img.addEventListener("click", () => {
+        lightboxImg.src = img.currentSrc || img.src;
+        lightboxImg.alt = img.alt || "预览图";
+        lightbox.classList.add("open");
+        lightbox.setAttribute("aria-hidden", "false");
+      });
+    });
+    lightbox.addEventListener("click", event => {
+      if (event.target === lightbox) closeLightbox();
+    });
+    lightbox.querySelector(".lightbox-close").addEventListener("click", closeLightbox);
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape" && lightbox.classList.contains("open")) closeLightbox();
+    });
+  </script>
+</body>
+
+</html>
